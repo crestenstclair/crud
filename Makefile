@@ -12,3 +12,6 @@ deploy: clean build
 
 fmt:
 	gofumpt -l -w .
+
+test:
+	go test ./... -v
