@@ -9,3 +9,6 @@ clean:
 
 deploy: clean build
 	sls deploy --verbose
+
+fmt:
+	gofumpt -l -w .
