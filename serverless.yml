@@ -74,14 +74,11 @@ resources:
             AttributeType: "S"
           - AttributeName: "Email"
             AttributeType: "S"
-
         KeySchema:
-          - AttributeName: "Email"
-            KeyType: "HASH"
           - AttributeName: "ID"
-            KeyType: "RANGE"
+            KeyType: "HASH"
         GlobalSecondaryIndexes:
-          - IndexName: "GSI"
+          - IndexName: "Email"
             KeySchema:
               - AttributeName: "Email"
                 KeyType: "HASH"
