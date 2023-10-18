@@ -45,11 +45,28 @@ func (d DynamoRepo) GetUser(ctx context.Context, userID string) (*user.User, err
 
 	var result *user.User
 
-  err = dynamodbattribute.UnmarshalMap(response.Item, &result)
+	err = dynamodbattribute.UnmarshalMap(response.Item, &result)
 
-  if err != nil {
-    return nil, err
-  }
+	if err != nil {
+		return nil, err
+	}
 
 	return result, nil
+}
+
+func (d DynamoRepo) CreateUser(ctx context.Context, u user.User) (*user.User, error) {
+	av, err := dynamodbattribute.MarshalMap(u)
+	if err != nil {
+		return nil, err
+	}
+	_, err = d.client.PutItem(&dynamodb.PutItemInput{
+		Item:      av,
+		TableName: &d.tableName,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
