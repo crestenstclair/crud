@@ -45,7 +45,11 @@ func (d DynamoRepo) GetUser(ctx context.Context, userID string) (*user.User, err
 
 	var result *user.User
 
-	dynamodbattribute.UnmarshalMap(response.Item, &result)
+  err = dynamodbattribute.UnmarshalMap(response.Item, &result)
+
+  if err != nil {
+    return nil, err
+  }
 
 	return result, nil
 }
