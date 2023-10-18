@@ -251,7 +251,7 @@ func TestDeleteUser(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 		client.On("DeleteItem", &dynamodb.DeleteItemInput{
-      TableName: aws.String("tableName"),
+			TableName:           aws.String("tableName"),
 			ConditionExpression: aws.String("attribute_exists(ID)"),
 			Key: map[string]*dynamodb.AttributeValue{
 				"ID": {
