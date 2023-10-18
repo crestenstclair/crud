@@ -155,10 +155,68 @@ func TestCreateUser(t *testing.T) {
 					S: aws.String(DOB.Format(time.RFC3339)),
 				},
 			},
-			TableName: aws.String("tableName"),
+			ConditionExpression: aws.String("attribute_not_exists(Email)"),
+			TableName:           aws.String("tableName"),
 		}).Return(nil, nil)
 		ctx := context.Background()
 		_, err := repo.CreateUser(ctx, user.User{
+			ID:           userID,
+			FirstName:    firstName,
+			LastName:     lastName,
+			Email:        email,
+			DOB:          DOB,
+			CreatedAt:    &DOB,
+			LastModified: &DOB,
+		})
+
+		assert.NoError(t, err)
+	})
+}
+
+func TestUpdateUser(t *testing.T) {
+	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
+	t.Run("Returns error when error occurs", func(t *testing.T) {
+		client := &DynamodbMockClient{}
+		repo, _ := dynamo.New("tableName", client)
+		client.On("PutItem", mock.Anything).Return(nil, errors.New("test error"))
+		ctx := context.Background()
+		_, err := repo.UpdateUser(ctx, user.User{})
+
+		assert.Error(t, err)
+	})
+
+	t.Run("Properly marshalls passed in user into attribute struct", func(t *testing.T) {
+		client := &DynamodbMockClient{}
+		repo, _ := dynamo.New("tableName", client)
+		client.On("PutItem", &dynamodb.PutItemInput{
+			ConditionExpression: aws.String("attribute_exists(ID)"),
+			Item: map[string]*dynamodb.AttributeValue{
+				"ID": {
+					S: aws.String(userID),
+				},
+				"FirstName": {
+					S: aws.String(firstName),
+				},
+				"LastName": {
+					S: aws.String(lastName),
+				},
+				"Email": {
+					S: aws.String(email),
+				},
+				"DOB": {
+					S: aws.String(DOB.Format(time.RFC3339)),
+				},
+				"CreatedAt": {
+					S: aws.String(DOB.Format(time.RFC3339)),
+				},
+				"LastModified": {
+					S: aws.String(DOB.Format(time.RFC3339)),
+				},
+			},
+			TableName: aws.String("tableName"),
+		}).Return(nil, nil)
+		ctx := context.Background()
+		_, err := repo.UpdateUser(ctx, user.User{
 			ID:           userID,
 			FirstName:    firstName,
 			LastName:     lastName,

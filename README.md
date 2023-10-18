@@ -13,6 +13,7 @@ TODO:
 - [TODO] Error handling with descriptive error code and message
 - [TODO] Run all commands in docker container
 - [TODO] Local integration tests
-
+- [TODO] Add test to ensure client is working
+- [TODO] Interesting decisions section for readme
 
 using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html
