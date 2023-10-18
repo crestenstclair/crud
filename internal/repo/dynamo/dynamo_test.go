@@ -51,6 +51,12 @@ func (m *DynamodbMockClient) PutItem(input *dynamodb.PutItemInput) (*dynamodb.Pu
 	return &dynamodb.PutItemOutput{}, args.Error(1)
 }
 
+func (m *DynamodbMockClient) DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
+	args := m.Called(input)
+
+	return nil, args.Error(1)
+}
+
 func TestGetUser(t *testing.T) {
 	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
 	t.Run("Returns error when error occurs", func(t *testing.T) {
@@ -225,6 +231,35 @@ func TestUpdateUser(t *testing.T) {
 			CreatedAt:    &DOB,
 			LastModified: &DOB,
 		})
+
+		assert.NoError(t, err)
+	})
+}
+
+func TestDeleteUser(t *testing.T) {
+	t.Run("Returns error when error occurs", func(t *testing.T) {
+		client := &DynamodbMockClient{}
+		repo, _ := dynamo.New("tableName", client)
+		client.On("DeleteItem", mock.Anything).Return(nil, errors.New("test error"))
+		ctx := context.Background()
+		err := repo.DeleteUser(ctx, userID)
+
+		assert.Error(t, err)
+	})
+
+	t.Run("Returns nil when no error occurs", func(t *testing.T) {
+		client := &DynamodbMockClient{}
+		repo, _ := dynamo.New("tableName", client)
+		client.On("DeleteItem", &dynamodb.DeleteItemInput{
+			ConditionExpression: aws.String("attribute_exists(ID)"),
+			Key: map[string]*dynamodb.AttributeValue{
+				"ID": {
+					S: aws.String(userID),
+				},
+			},
+		}).Return(nil, nil)
+		ctx := context.Background()
+		err := repo.DeleteUser(ctx, userID)
 
 		assert.NoError(t, err)
 	})
