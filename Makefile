@@ -17,6 +17,9 @@ fmt:
 	gofumpt -l -w .
 
 test:
+	go test ./...
+
+testv:
 	go test ./... -v
 
 gen:

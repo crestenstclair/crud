@@ -10,8 +10,17 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/crestenstclair/crud/internal/repo/dynamo"
+	"github.com/crestenstclair/crud/internal/user"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+)
+
+// Set up some shared testing variables to avoid magic strings
+var (
+	userID    = "userID"
+	firstName = "firstName"
+	lastName  = "lastName"
+	email     = "example@example.com"
 )
 
 type DynamodbMockClient struct {
@@ -36,13 +45,20 @@ func (m *DynamodbMockClient) GetItem(input *dynamodb.GetItemInput) (*dynamodb.Ge
 	return resultOne, args.Error(1)
 }
 
+func (m *DynamodbMockClient) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	args := m.Called(input)
+
+	return &dynamodb.PutItemOutput{}, args.Error(1)
+}
+
 func TestGetUser(t *testing.T) {
+	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 		client.On("GetItem", mock.Anything).Return(nil, errors.New("test error"))
 		ctx := context.Background()
-		_, err := repo.GetUser(ctx, "userID")
+		_, err := repo.GetUser(ctx, userID)
 
 		assert.Error(t, err)
 	})
@@ -52,7 +68,7 @@ func TestGetUser(t *testing.T) {
 		repo, _ := dynamo.New("tableName", client)
 		client.On("GetItem", mock.Anything).Return(nil, nil)
 		ctx := context.Background()
-		res, err := repo.GetUser(ctx, "userID")
+		res, err := repo.GetUser(ctx, userID)
 
 		assert.NoError(t, err)
 		assert.Nil(t, res)
@@ -64,31 +80,31 @@ func TestGetUser(t *testing.T) {
 		client.On("GetItem", &dynamodb.GetItemInput{
 			Key: map[string]*dynamodb.AttributeValue{
 				"ID": {
-					S: aws.String("userID"),
+					S: aws.String(userID),
 				},
 			},
 			TableName: aws.String("tableName"),
 		}).Return(&dynamodb.GetItemOutput{
 			Item: map[string]*dynamodb.AttributeValue{
 				"ID": {
-					S: aws.String("userID"),
+					S: aws.String(userID),
 				},
 				"FirstName": {
-					S: aws.String("firstName"),
+					S: aws.String(firstName),
 				},
 				"LastName": {
-					S: aws.String("lastName"),
+					S: aws.String(lastName),
 				},
 				"Email": {
-					S: aws.String("example@example.com"),
+					S: aws.String(email),
 				},
 				"DOB": {
-					S: aws.String("1970-12-09T00:00:00Z"),
+					S: aws.String(DOB.Format(time.RFC3339)),
 				},
 			},
 		}, nil)
 		ctx := context.Background()
-		result, err := repo.GetUser(ctx, "userID")
+		result, err := repo.GetUser(ctx, userID)
 
 		assert.NoError(t, err)
 
@@ -96,6 +112,62 @@ func TestGetUser(t *testing.T) {
 		assert.Equal(t, "firstName", result.FirstName)
 		assert.Equal(t, "lastName", result.LastName)
 		assert.Equal(t, "example@example.com", result.Email)
-		assert.Equal(t, "1970-12-09T00:00:00Z", result.DOB.Format(time.RFC3339))
+		assert.Equal(t, "1979-12-09T00:00:00Z", result.DOB.Format(time.RFC3339))
+	})
+}
+
+func TestCreateUser(t *testing.T) {
+	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
+	t.Run("Returns error when error occurs", func(t *testing.T) {
+		client := &DynamodbMockClient{}
+		repo, _ := dynamo.New("tableName", client)
+		client.On("PutItem", mock.Anything).Return(nil, errors.New("test error"))
+		ctx := context.Background()
+		_, err := repo.CreateUser(ctx, user.User{})
+
+		assert.Error(t, err)
+	})
+
+	t.Run("Properly marshalls passed in user into attribute struct", func(t *testing.T) {
+		client := &DynamodbMockClient{}
+		repo, _ := dynamo.New("tableName", client)
+		client.On("PutItem", &dynamodb.PutItemInput{
+			Item: map[string]*dynamodb.AttributeValue{
+				"ID": {
+					S: aws.String(userID),
+				},
+				"FirstName": {
+					S: aws.String(firstName),
+				},
+				"LastName": {
+					S: aws.String(lastName),
+				},
+				"Email": {
+					S: aws.String(email),
+				},
+				"DOB": {
+					S: aws.String(DOB.Format(time.RFC3339)),
+				},
+				"CreatedAt": {
+					S: aws.String(DOB.Format(time.RFC3339)),
+				},
+				"LastModified": {
+					S: aws.String(DOB.Format(time.RFC3339)),
+				},
+			},
+			TableName: aws.String("tableName"),
+		}).Return(nil, nil)
+		ctx := context.Background()
+		_, err := repo.CreateUser(ctx, user.User{
+			ID:           userID,
+			FirstName:    firstName,
+			LastName:     lastName,
+			Email:        email,
+			DOB:          DOB,
+			CreatedAt:    &DOB,
+			LastModified: &DOB,
+		})
+
+		assert.NoError(t, err)
 	})
 }
