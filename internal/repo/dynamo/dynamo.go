@@ -16,7 +16,6 @@ type DynamoRepo struct {
 }
 
 func New(tableName string, db dynamodbiface.DynamoDBAPI) (*DynamoRepo, error) {
-	// TODO: add test to ensure client is working
 	return &DynamoRepo{
 		client:    db,
 		tableName: tableName,
@@ -60,8 +59,27 @@ func (d DynamoRepo) CreateUser(ctx context.Context, u user.User) (*user.User, er
 		return nil, err
 	}
 	_, err = d.client.PutItem(&dynamodb.PutItemInput{
-		Item:      av,
-		TableName: &d.tableName,
+		Item:                av,
+		TableName:           &d.tableName,
+		ConditionExpression: aws.String("attribute_not_exists(Email)"),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
+}
+
+func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, error) {
+	av, err := dynamodbattribute.MarshalMap(u)
+	if err != nil {
+		return nil, err
+	}
+	_, err = d.client.PutItem(&dynamodb.PutItemInput{
+		Item:                av,
+		TableName:           &d.tableName,
+		ConditionExpression: aws.String("attribute_exists(ID)"),
 	})
 
 	if err != nil {
