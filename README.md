@@ -1,8 +1,7 @@
 TODO:
-
 - [TODO] Set up the serverless framework for local testing, etc.
-- [TODO] Should deploy with Serverless deploy
-- [TODO] Spin up DynamoDB
+- [DONE] Should deploy with Serverless deploy
+- [DONE] Spin up DynamoDB
 - [TODO] Enable the addition of a new user with fiels like userid, email. name, DOB, etc.
 - [TODO] Fetch user information based on UserID
 - [TODO] Modify exusting user details using UserID
@@ -12,3 +11,8 @@ TODO:
 - [TODO] PUT
 - [TODO] DELETE
 - [TODO] Error handling with descriptive error code and message
+- [TODO] Run all commands in docker container
+- [TODO] Local integration tests
+
+
+using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html

@@ -10,10 +10,13 @@ import (
 var validate *validator.Validate
 
 type User struct {
-	FirstName string    `validate:"required"`
-	LastName  string    `validate:"required"`
-	Email     string    `validate:"required,email"`
-	DOB       time.Time `validate:"required"`
+	ID           string
+	FirstName    string    `validate:"required"`
+	LastName     string    `validate:"required"`
+	Email        string    `validate:"required,email"`
+	DOB          time.Time `validate:"required"`
+	CreatedAt    *time.Time
+	LastModified *time.Time
 }
 
 func New(FirstName string, LastName string, Email string, DOB string) (*User, error) {
