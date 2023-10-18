@@ -91,6 +91,7 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 
 func (d DynamoRepo) DeleteUser(ctx context.Context, userID string) error {
 	_, err := d.client.DeleteItem(&dynamodb.DeleteItemInput{
+		TableName:           &d.tableName,
 		ConditionExpression: aws.String("attribute_exists(ID)"),
 		Key: map[string]*dynamodb.AttributeValue{
 			"ID": {
