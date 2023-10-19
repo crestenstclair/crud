@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-  ID           string `validate:"uuid"`
+	ID           string `validate:"uuid"`
 	FirstName    string `validate:"required"`
 	LastName     string `validate:"required"`
 	Email        string `validate:"required,email"`
@@ -36,15 +36,15 @@ func Parse(jsonString string) (*User, error) {
 
 func New(FirstName string, LastName string, Email string, DOB string) (*User, error) {
 	result := &User{
-		FirstName:    FirstName,
-		LastName:     LastName,
-		Email:        Email,
-		DOB:          DOB,
+		FirstName: FirstName,
+		LastName:  LastName,
+		Email:     Email,
+		DOB:       DOB,
 	}
 
-  result.LastModified = time.Now().Format(time.RFC3339)
-  result.CreatedAt = time.Now().Format(time.RFC3339)
-  result.ID = uuid.NewString()
+	result.LastModified = time.Now().Format(time.RFC3339)
+	result.CreatedAt = time.Now().Format(time.RFC3339)
+	result.ID = uuid.NewString()
 
 	err := validator.GetValidator().Struct(result)
 	if err != nil {

@@ -17,40 +17,39 @@ func CreateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 
 	defer cancel()
 
-  crud.Logger.Info(request.Body)
+	crud.Logger.Info(request.Body)
 
-  var body map[string]string
+	var body map[string]string
 	err := json.Unmarshal([]byte(request.Body), &body)
 
-  usr, err := user.New(
-    body["firstName"],
-    body["lastName"],
-    body["email"],
-    body["DOB"],
-  )
-
-  if err != nil {
+	usr, err := user.New(
+		body["firstName"],
+		body["lastName"],
+		body["email"],
+		body["DOB"],
+	)
+	if err != nil {
 		crud.Logger.Error("Invalid user provided", zap.Error(err))
 
 		return makeResponse(map[string]string{
 			"error": err.Error(),
 		}, 400), nil
-  }
+	}
 
 	_, err = crud.Repo.CreateUser(ctx, *usr)
 
-  switch err.(type) {
-  case nil:
-    return makeResponse(usr, 200), nil
-  case *dynamodb.ConditionalCheckFailedException:
+	switch err.(type) {
+	case nil:
+		return makeResponse(usr, 200), nil
+	case *dynamodb.ConditionalCheckFailedException:
 		crud.Logger.Error("Failed to create user, duplicate user provided", zap.Error(err))
-    return makeResponse(map[string]string{
-      "error":"Email already in use",
-    }, 400), nil
-  default:
+		return makeResponse(map[string]string{
+			"error": "Email already in use",
+		}, 400), nil
+	default:
 		crud.Logger.Error("Failed to create user", zap.Error(err))
-    return makeResponse(map[string]string{
+		return makeResponse(map[string]string{
 			"error": "An internal error occured",
 		}, 500), nil
-  }
+	}
 }

@@ -6,7 +6,7 @@ TODO:
 - [DONE] Fetch user information based on UserID
 - [DONE] Modify exusting user details using UserID
 - [DONE] Remove a user record based on UserID
-- [TODO] /users (POST) to add a new user
+- [DONE] /users (POST) to add a new user
 - [DONE] /users/ GET to retrieve details of the user
 - [TODO] PUT
 - [TODO] DELETE

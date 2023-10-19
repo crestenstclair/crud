@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/crestenstclair/crud/internal/user"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,8 +22,6 @@ func TestNew(t *testing.T) {
 			exampleLastName,
 			exampleEmail,
 			"INVALID",
-			exampleDOB,
-			exampleDOB,
 		)
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
@@ -32,8 +31,6 @@ func TestNew(t *testing.T) {
 			exampleLastName,
 			exampleEmail,
 			"",
-			exampleDOB,
-			exampleDOB,
 		)
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
@@ -42,8 +39,6 @@ func TestNew(t *testing.T) {
 			"",
 			exampleLastName,
 			exampleEmail,
-			exampleDOB,
-			exampleDOB,
 			exampleDOB,
 		)
 
@@ -55,8 +50,6 @@ func TestNew(t *testing.T) {
 			"",
 			exampleEmail,
 			exampleDOB,
-			exampleDOB,
-			exampleDOB,
 		)
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.LastName'")
@@ -66,8 +59,6 @@ func TestNew(t *testing.T) {
 			exampleFirstName,
 			exampleLastName,
 			"",
-			exampleDOB,
-			exampleDOB,
 			exampleDOB,
 		)
 
@@ -79,8 +70,6 @@ func TestNew(t *testing.T) {
 			exampleLastName,
 			"notAnEmail",
 			exampleDOB,
-			exampleDOB,
-			exampleDOB,
 		)
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag")
@@ -90,9 +79,6 @@ func TestNew(t *testing.T) {
 			exampleFirstName,
 			exampleLastName,
 			exampleEmail,
-
-			exampleDOB,
-			exampleDOB,
 			exampleDOB,
 		)
 
@@ -103,13 +89,48 @@ func TestNew(t *testing.T) {
 		assert.Equal(t, exampleEmail, result.Email)
 		assert.Regexp(t, exampleDOB, result.DOB)
 	})
-	t.Run("Does not error when user is valid", func(t *testing.T) {})
+	t.Run("Sets userID properly", func(t *testing.T) {
+		result, err := user.New(
+			exampleFirstName,
+			exampleLastName,
+			exampleEmail,
+			exampleDOB,
+		)
+
+		assert.NoError(t, err)
+
+		assert.NotEqual(t, "", result.ID)
+	})
+	t.Run("sets lastmodified", func(t *testing.T) {
+		result, err := user.New(
+			exampleFirstName,
+			exampleLastName,
+			exampleEmail,
+			exampleDOB,
+		)
+
+		assert.NoError(t, err)
+
+		assert.NotEqual(t, "", result.CreatedAt)
+	})
+	t.Run("sets createdAt", func(t *testing.T) {
+		result, err := user.New(
+			exampleFirstName,
+			exampleLastName,
+			exampleEmail,
+			exampleDOB,
+		)
+
+		assert.NoError(t, err)
+
+		assert.NotEqual(t, "", result.LastModified)
+	})
 }
 
 func makeTestUser() *user.User {
 	testTime := time.Now().Format(time.RFC3339)
 	return &user.User{
-		ID:           "id",
+		ID:           uuid.NewString(),
 		FirstName:    "firstName",
 		LastName:     "lastName",
 		Email:        "example@example.com",
