@@ -26,7 +26,6 @@ func Handler(request events.APIGatewayProxyRequest) (Response, error) {
 	}
 	json.HTMLEscape(&buf, body)
 
-
 	resp := Response{
 		StatusCode:      200,
 		IsBase64Encoded: false,

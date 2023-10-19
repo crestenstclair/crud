@@ -3,10 +3,17 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/crestenstclair/crud/internal/config"
+	"github.com/crestenstclair/crud/internal/crud"
+	"github.com/crestenstclair/crud/internal/repo/dynamo"
+	"go.uber.org/zap"
 )
+
+var inst *crud.Crud
 
 // Response is of type APIGatewayProxyResponse since we're leveraging the
 // AWS Lambda Proxy Request functionality (default behavior)
@@ -26,7 +33,6 @@ func Handler(request events.APIGatewayProxyRequest) (Response, error) {
 	}
 	json.HTMLEscape(&buf, body)
 
-
 	resp := Response{
 		StatusCode:      200,
 		IsBase64Encoded: false,
@@ -42,4 +48,13 @@ func Handler(request events.APIGatewayProxyRequest) (Response, error) {
 
 func main() {
 	lambda.Start(Handler)
+}
+
+func init() {
+	tmp, err := crud.New()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	inst = tmp
 }
