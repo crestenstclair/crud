@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/crestenstclair/crud/internal/config"
@@ -19,7 +18,7 @@ import (
 )
 
 func makeTestUser() user.User {
-	testTime := time.Now().Format(time.RFC3339)
+	testTime := "1979-12-09T00:00:00Z"
 	return user.User{
 		ID:           "id",
 		FirstName:    "firstName",
@@ -55,9 +54,9 @@ func TestGetUser(t *testing.T) {
 		assert.Equal(t, testUser.FirstName, result.FirstName)
 		assert.Equal(t, testUser.LastName, result.LastName)
 		assert.Equal(t, testUser.Email, result.Email)
-		assert.Equal(t, testUser.DOB.Format(time.RFC3339), result.DOB.Format(time.RFC3339))
-		assert.Equal(t, testUser.CreatedAt.Format(time.RFC3339), result.CreatedAt.Format(time.RFC3339))
-		assert.Equal(t, testUser.LastModified.Format(time.RFC3339), result.LastModified.Format(time.RFC3339))
+		assert.Equal(t, testUser.DOB, result.DOB)
+		assert.Equal(t, testUser.CreatedAt, result.CreatedAt)
+		assert.Equal(t, testUser.LastModified, result.LastModified)
 	})
 	t.Run("Returns 500 when an internal server error occurs", func(t *testing.T) {
 		mockRepo := mocks.Repo{}

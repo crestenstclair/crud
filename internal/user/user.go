@@ -11,7 +11,7 @@ type User struct {
 	FirstName    string `validate:"required"`
 	LastName     string `validate:"required"`
 	Email        string `validate:"required,email"`
-	DOB          string `validate:"required"`
+	DOB          string `validate:"required,RFC3339Date"`
 	CreatedAt    string `validate:"RFC3339Date"`
 	LastModified string `validate:"RFC3339Date"`
 }

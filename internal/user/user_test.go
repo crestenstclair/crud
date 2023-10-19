@@ -18,11 +18,11 @@ func TestNew(t *testing.T) {
 			exampleFirstName,
 			exampleLastName,
 			exampleEmail,
-			"1970-12-09",
+			"INVALID",
 			exampleDOB,
 			exampleDOB,
 		)
-		assert.ErrorContains(t, err, "Parsing DOB failed.")
+		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
 	t.Run("Errors when DOB is not provided", func(t *testing.T) {
 		_, err := user.New(
@@ -33,7 +33,7 @@ func TestNew(t *testing.T) {
 			exampleDOB,
 			exampleDOB,
 		)
-		assert.ErrorContains(t, err, "Parsing DOB failed.")
+		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
 	t.Run("Errors when not provided required FirstName", func(t *testing.T) {
 		_, err := user.New(
