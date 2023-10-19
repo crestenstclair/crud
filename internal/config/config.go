@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	DYNAMODB_TABLE  string `env:"DYNAMODB_TABLE,required"`
+	DYNAMODB_TABLE   string `env:"DYNAMODB_TABLE,required"`
 	RequestTimeoutMS int    `env:"REQUEST_TIMEOUT_MS" envDefault:"200"`
 }
 

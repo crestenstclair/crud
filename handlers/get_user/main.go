@@ -13,7 +13,7 @@ import (
 var inst *crud.Crud
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-  return handlers.GetUser(ctx, request, inst)
+	return handlers.GetUser(ctx, request, inst)
 }
 
 func main() {

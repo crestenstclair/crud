@@ -19,7 +19,6 @@ func GetUser(ctx context.Context, request events.APIGatewayProxyRequest, crud *c
 
 	id := request.PathParameters["id"]
 	user, err := crud.Repo.GetUser(ctx, id)
-
 	if err != nil {
 		crud.Logger.Error("Failed to get user", zap.Error(err))
 		return events.APIGatewayProxyResponse{
@@ -33,17 +32,16 @@ func GetUser(ctx context.Context, request events.APIGatewayProxyRequest, crud *c
 
 	}
 
-  if user == nil {
-    return events.APIGatewayProxyResponse{
+	if user == nil {
+		return events.APIGatewayProxyResponse{
 			StatusCode:      404,
 			IsBase64Encoded: false,
-      Body:            fmt.Sprintf("User not found. ID: %s", id),
+			Body:            fmt.Sprintf("User not found. ID: %s", id),
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
 		}, nil
-
-  }
+	}
 
 	body, err := json.Marshal(user)
 	var buf bytes.Buffer

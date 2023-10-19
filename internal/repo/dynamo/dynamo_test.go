@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -21,6 +20,7 @@ var (
 	firstName = "firstName"
 	lastName  = "lastName"
 	email     = "example@example.com"
+	DOB       = "1979-12-09T00:00:00Z"
 )
 
 type DynamodbMockClient struct {
@@ -58,7 +58,6 @@ func (m *DynamodbMockClient) DeleteItem(input *dynamodb.DeleteItemInput) (*dynam
 }
 
 func TestGetUser(t *testing.T) {
-	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
@@ -105,7 +104,7 @@ func TestGetUser(t *testing.T) {
 					S: aws.String(email),
 				},
 				"DOB": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 			},
 		}, nil)
@@ -118,12 +117,11 @@ func TestGetUser(t *testing.T) {
 		assert.Equal(t, "firstName", result.FirstName)
 		assert.Equal(t, "lastName", result.LastName)
 		assert.Equal(t, "example@example.com", result.Email)
-		assert.Equal(t, "1979-12-09T00:00:00Z", result.DOB.Format(time.RFC3339))
+		assert.Equal(t, "1979-12-09T00:00:00Z", result.DOB)
 	})
 }
 
 func TestCreateUser(t *testing.T) {
-	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
@@ -152,13 +150,13 @@ func TestCreateUser(t *testing.T) {
 					S: aws.String(email),
 				},
 				"DOB": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 				"CreatedAt": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 				"LastModified": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 			},
 			ConditionExpression: aws.String("attribute_not_exists(Email)"),
@@ -171,8 +169,8 @@ func TestCreateUser(t *testing.T) {
 			LastName:     lastName,
 			Email:        email,
 			DOB:          DOB,
-			CreatedAt:    &DOB,
-			LastModified: &DOB,
+			CreatedAt:    DOB,
+			LastModified: DOB,
 		})
 
 		assert.NoError(t, err)
@@ -180,7 +178,6 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	DOB, _ := time.Parse(time.RFC3339, "1979-12-09T00:00:00Z")
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
@@ -210,13 +207,13 @@ func TestUpdateUser(t *testing.T) {
 					S: aws.String(email),
 				},
 				"DOB": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 				"CreatedAt": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 				"LastModified": {
-					S: aws.String(DOB.Format(time.RFC3339)),
+					S: aws.String(DOB),
 				},
 			},
 			TableName: aws.String("tableName"),
@@ -228,8 +225,8 @@ func TestUpdateUser(t *testing.T) {
 			LastName:     lastName,
 			Email:        email,
 			DOB:          DOB,
-			CreatedAt:    &DOB,
-			LastModified: &DOB,
+			CreatedAt:    DOB,
+			LastModified: DOB,
 		})
 
 		assert.NoError(t, err)

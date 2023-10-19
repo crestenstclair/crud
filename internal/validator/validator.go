@@ -6,21 +6,20 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-
 var validate *validator.Validate
 
 func GetValidator() *validator.Validate {
-  return validate
+	return validate
 }
 
 func IsRFC3339Date(fl validator.FieldLevel) bool {
-  target := fl.Field().String()
-  // Handle case where field is note required
-  if target == "" {
-    return true
-  }
+	target := fl.Field().String()
+	// Handle case where field is note required
+	if target == "" {
+		return true
+	}
 	_, err := time.Parse(time.RFC3339, target)
-  return err == nil
+	return err == nil
 }
 
 func init() {
@@ -28,5 +27,5 @@ func init() {
 	// https://pkg.go.dev/github.com/go-playground/validator/v10#hdr-Singleton
 	validate = validator.New(validator.WithRequiredStructEnabled())
 
-  _ = validate.RegisterValidation("RFC3339Date", IsRFC3339Date)
+	_ = validate.RegisterValidation("RFC3339Date", IsRFC3339Date)
 }
