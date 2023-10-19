@@ -7,15 +7,15 @@ TODO:
 - [DONE] Modify exusting user details using UserID
 - [DONE] Remove a user record based on UserID
 - [TODO] /users (POST) to add a new user
-- [TODO] /users/ GET to retrieve details of the user
+- [DONE] /users/ GET to retrieve details of the user
 - [TODO] PUT
 - [TODO] DELETE
 - [TODO] Error handling with descriptive error code and message
 - [TODO] Run all commands in docker container
-- [TODO] Local integration tests
+- [WONT] Local integration tests
 - [TODO] Add test to ensure client is working
 - [TODO] Interesting decisions section for readme
 - [TODO] Update "LastModified" and "CreatedAt" to actually work ( or drop them )
-- [TODO] Update date fields to strings instead of time objects
+- [DONE] Update date fields to strings instead of time objects
 
 using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html

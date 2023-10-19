@@ -29,6 +29,9 @@ func New() (*Crud, error) {
 	sess := session.Must(session.NewSession())
 	client := dynamodb.New(sess)
 	repo, err := dynamo.New(cfg.DYNAMODB_TABLE, client)
+  if err != nil {
+		return nil, err
+	}
 	return &Crud{
 		Logger: logger,
 		Repo:   repo,

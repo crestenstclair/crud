@@ -44,6 +44,20 @@ func GetUser(ctx context.Context, request events.APIGatewayProxyRequest, crud *c
 	}
 
 	body, err := json.Marshal(user)
+
+	if err != nil {
+		crud.Logger.Error("Failed to get user", zap.Error(err))
+		return events.APIGatewayProxyResponse{
+			StatusCode:      500,
+			IsBase64Encoded: false,
+			Body:            "An internal error has occured",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+		}, nil
+
+	}
+  
 	var buf bytes.Buffer
 	json.HTMLEscape(&buf, body)
 
