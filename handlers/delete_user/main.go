@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -16,24 +15,25 @@ import (
 type Response events.APIGatewayProxyResponse
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
-func Handler(ctx context.Context) (Response, error) {
+func Handler(request events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
 
 	body, err := json.Marshal(map[string]interface{}{
-		"message": "Okay so your other function also executed successfully!",
+		"message": "Go Serverless v1.0! Your function executed successfully!",
 	})
 	if err != nil {
 		return Response{StatusCode: 404}, err
 	}
 	json.HTMLEscape(&buf, body)
 
+
 	resp := Response{
 		StatusCode:      200,
 		IsBase64Encoded: false,
-		Body:            buf.String(),
+		Body:            "works",
 		Headers: map[string]string{
 			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "world-handler",
+			"X-MyCompany-Func-Reply": "hello-handler",
 		},
 	}
 

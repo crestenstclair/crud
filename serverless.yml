@@ -52,17 +52,11 @@ package:
     - '!./**'
     - ./bin/**
 functions:
-  hello:
-    handler: bin/hello
+  get_user:
+    handler: bin/handlers/get_user
     events:
       - httpApi:
-          path: /hello
-          method: get
-  world:
-    handler: bin/world
-    events:
-      - httpApi:
-          path: /world
+          path: /user/{id}
           method: get
 resources:
   Resources:

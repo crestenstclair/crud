@@ -4,8 +4,8 @@ TODO:
 - [DONE] Spin up DynamoDB
 - [DONE] Enable the addition of a new user with fiels like userid, email. name, DOB, etc.
 - [DONE] Fetch user information based on UserID
-- [TODO] Modify exusting user details using UserID
-- [TODO] Remove a user record based on UserID
+- [DONE] Modify exusting user details using UserID
+- [DONE] Remove a user record based on UserID
 - [TODO] /users (POST) to add a new user
 - [TODO] /users/ GET to retrieve details of the user
 - [TODO] PUT
