@@ -213,6 +213,7 @@ func TestParse(t *testing.T) {
 		assert.NoError(t, err)
 
 		result, err := user.Parse(string(str))
+    assert.NoError(t, err)
 
 		assert.Equal(t, testUser.FirstName, result.FirstName)
 		assert.Equal(t, testUser.LastName, result.LastName)

@@ -21,7 +21,12 @@ func CreateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 
 	var body map[string]string
 	err := json.Unmarshal([]byte(request.Body), &body)
-
+  if err != nil {
+    crud.Logger.Error("Failed to create user", zap.Error(err))
+		return makeResponse(map[string]string{
+			"error": "An internal error occured",
+		}, 500), nil
+  }
 	usr, err := user.New(
 		body["firstName"],
 		body["lastName"],
