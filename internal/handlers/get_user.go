@@ -45,6 +45,7 @@ func GetUser(ctx context.Context, request events.APIGatewayProxyRequest, crud *c
 	}
 
 	if user == nil {
+		crud.Logger.Error("User not found", zap.String("id", id))
 		return makeResponse(map[string]string{
       "error": fmt.Sprintf("User not found. ID: %s", id),
     }, 404), nil
