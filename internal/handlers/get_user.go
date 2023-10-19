@@ -12,7 +12,6 @@ import (
 
 func GetUser(ctx context.Context, request events.APIGatewayProxyRequest, crud *crud.Crud) (events.APIGatewayProxyResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(crud.Config.RequestTimeoutMS)*time.Millisecond)
-	defer crud.Logger.Sync()
 	defer cancel()
 
 	id := request.PathParameters["id"]

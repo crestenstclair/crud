@@ -16,9 +16,7 @@ func CreateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(crud.Config.RequestTimeoutMS)*time.Millisecond)
 
 	defer cancel()
-
 	crud.Logger.Info(request.Body)
-	defer crud.Logger.Sync()
 
 	var body map[string]string
 	err := json.Unmarshal([]byte(request.Body), &body)
