@@ -1,7 +1,6 @@
 package crud
 
-import (
-	"github.com/aws/aws-sdk-go/aws/session"
+import ( "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/crestenstclair/crud/internal/config"
 	"github.com/crestenstclair/crud/internal/repo"
@@ -28,7 +27,7 @@ func New() (*Crud, error) {
 
 	sess := session.Must(session.NewSession())
 	client := dynamodb.New(sess)
-	repo, err := dynamo.New(cfg.DynamoTableName, client)
+	repo, err := dynamo.New(cfg.DYNAMODB_TABLE, client)
 	return &Crud{
 		Logger: logger,
 		Repo:   repo,

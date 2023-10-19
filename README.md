@@ -16,5 +16,6 @@ TODO:
 - [TODO] Add test to ensure client is working
 - [TODO] Interesting decisions section for readme
 - [TODO] Update "LastModified" and "CreatedAt" to actually work ( or drop them )
+- [TODO] Update date fields to strings instead of time objects
 
 using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html

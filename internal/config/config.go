@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	DynamoTableName string `env:"DYNAMO_TABLE_NAME,required"`
+	DYNAMODB_TABLE  string `env:"DYNAMODB_TABLE,required"`
+	RequestTimeoutMS int    `env:"REQUEST_TIMEOUT_MS" envDefault:"200"`
 }
 
 func New() (*Config, error) {
