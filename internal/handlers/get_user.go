@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -12,24 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func makeResponse[T any](respBody T, statusCode int) events.APIGatewayProxyResponse {
-	var buf bytes.Buffer
-
-	body, _ := json.Marshal(respBody)
-
-	json.HTMLEscape(&buf, body)
-	return events.APIGatewayProxyResponse{
-		StatusCode: statusCode,
-		Body:       buf.String(),
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-	}
-}
-
 func GetUser(ctx context.Context, request events.APIGatewayProxyRequest, crud *crud.Crud) (events.APIGatewayProxyResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(crud.Config.RequestTimeoutMS)*time.Millisecond)
-
 	defer cancel()
 
 	id := request.PathParameters["id"]

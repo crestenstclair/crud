@@ -11,7 +11,7 @@ provider:
   runtime: go1.x
   region: us-west-2
   environment:
-    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+    DYNAMODB_TABLE: user-${sls:stage}
   iam:
     role:
       statements:
@@ -53,6 +53,12 @@ functions:
       - httpApi:
           path: /user/{id}
           method: get
+  create_user:
+    handler: bin/handlers/create_user
+    events:
+      - httpApi:
+          path: /user
+          method: post
 resources:
   Resources:
     UserTable:
@@ -65,12 +71,12 @@ resources:
           - AttributeName: "Email"
             AttributeType: "S"
         KeySchema:
-          - AttributeName: "ID"
+          - AttributeName: "Email"
             KeyType: "HASH"
         GlobalSecondaryIndexes:
-          - IndexName: "Email"
+          - IndexName: "ID"
             KeySchema:
-              - AttributeName: "Email"
+              - AttributeName: "ID"
                 KeyType: "HASH"
             Projection:
               ProjectionType: "KEYS_ONLY"
