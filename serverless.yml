@@ -9,10 +9,9 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: go1.x
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
+  region: us-west-2
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${sls:stage}
   iam:
     role:
       statements:
@@ -42,33 +41,24 @@ provider:
             - dynamodb:Delete*
             - dynamodb:Update*
             - dynamodb:PutItem
-          Resource:
-            Fn::Join:
-              - ""
-              - - "arn:aws:dynamodb:*:*:"
-                - "Ref": "DDBTable"
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 package:
   patterns:
     - '!./**'
     - ./bin/**
 functions:
-  hello:
-    handler: bin/hello
+  get_user:
+    handler: bin/handlers/get_user
     events:
       - httpApi:
-          path: /hello
-          method: get
-  world:
-    handler: bin/world
-    events:
-      - httpApi:
-          path: /world
+          path: /user/{id}
           method: get
 resources:
   Resources:
-    DDBTable:
+    UserTable:
       Type: AWS::DynamoDB::Table
       Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
         AttributeDefinitions:
           - AttributeName: "ID"
             AttributeType: "S"

@@ -1,8 +1,12 @@
 .PHONY: build clean deploy
+SHELL:=/bin/bash
 
-build:
-	env CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/hello hello/main.go
-	env CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/world world/main.go
+.ONESHELL:
+build: clean
+	X=$$(find ./handlers/* -type d)
+	for dir in $$X ; do \
+		env CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/$$dir $$dir/main.go ; \
+	done
 
 clean:
 	rm -rf ./bin ./vendor Gopkg.lock
@@ -24,3 +28,6 @@ testv:
 
 gen:
 	go generate ./...
+
+lint:
+	docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.54.2 golangci-lint run -v

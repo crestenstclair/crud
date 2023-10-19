@@ -2,7 +2,6 @@ package user_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/crestenstclair/crud/internal/user"
 	"github.com/stretchr/testify/assert"
@@ -19,9 +18,11 @@ func TestNew(t *testing.T) {
 			exampleFirstName,
 			exampleLastName,
 			exampleEmail,
-			"1970-12-09",
+			"INVALID",
+			exampleDOB,
+			exampleDOB,
 		)
-		assert.ErrorContains(t, err, "Parsing DOB failed.")
+		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
 	t.Run("Errors when DOB is not provided", func(t *testing.T) {
 		_, err := user.New(
@@ -29,14 +30,18 @@ func TestNew(t *testing.T) {
 			exampleLastName,
 			exampleEmail,
 			"",
+			exampleDOB,
+			exampleDOB,
 		)
-		assert.ErrorContains(t, err, "Parsing DOB failed.")
+		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
 	t.Run("Errors when not provided required FirstName", func(t *testing.T) {
 		_, err := user.New(
 			"",
 			exampleLastName,
 			exampleEmail,
+			exampleDOB,
+			exampleDOB,
 			exampleDOB,
 		)
 
@@ -48,6 +53,8 @@ func TestNew(t *testing.T) {
 			"",
 			exampleEmail,
 			exampleDOB,
+			exampleDOB,
+			exampleDOB,
 		)
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.LastName'")
@@ -57,6 +64,8 @@ func TestNew(t *testing.T) {
 			exampleFirstName,
 			exampleLastName,
 			"",
+			exampleDOB,
+			exampleDOB,
 			exampleDOB,
 		)
 
@@ -68,6 +77,8 @@ func TestNew(t *testing.T) {
 			exampleLastName,
 			"notAnEmail",
 			exampleDOB,
+			exampleDOB,
+			exampleDOB,
 		)
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag")
@@ -77,6 +88,9 @@ func TestNew(t *testing.T) {
 			exampleFirstName,
 			exampleLastName,
 			exampleEmail,
+
+			exampleDOB,
+			exampleDOB,
 			exampleDOB,
 		)
 
@@ -85,7 +99,7 @@ func TestNew(t *testing.T) {
 		assert.Equal(t, exampleFirstName, result.FirstName)
 		assert.Equal(t, exampleLastName, result.LastName)
 		assert.Equal(t, exampleEmail, result.Email)
-		assert.Regexp(t, exampleDOB, result.DOB.Format(time.RFC3339))
+		assert.Regexp(t, exampleDOB, result.DOB)
 	})
 	t.Run("Does not error when user is valid", func(t *testing.T) {})
 }
