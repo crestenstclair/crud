@@ -1,7 +1,6 @@
 package handlers_test
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -18,24 +17,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap/zaptest"
 )
-
-func getUserMap() map[string]string {
-	return map[string]string{
-		"firstName": "firstName",
-		"lastName":  "lastName",
-		"email":     "example@example.com",
-		"DOB":       "1979-12-09T00:00:00Z",
-	}
-}
-
-func toJsonEscapedString(target map[string]string) string {
-	result, _ := json.Marshal(target)
-
-	var buf bytes.Buffer
-	json.HTMLEscape(&buf, result)
-
-	return buf.String()
-}
 
 func TestCreateUser(t *testing.T) {
 	t.Run("Returns 200 and user when create successful", func(t *testing.T) {
