@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/crestenstclair/crud/internal/config"
 	"github.com/crestenstclair/crud/internal/crud"
 	"github.com/crestenstclair/crud/internal/handlers"
+	"github.com/crestenstclair/crud/internal/repo/dynamo"
 	"github.com/crestenstclair/crud/internal/repo/mocks"
 	"github.com/crestenstclair/crud/internal/user"
 	"github.com/stretchr/testify/assert"
@@ -211,7 +211,7 @@ func TestCreateUser(t *testing.T) {
 
 		assert.Equal(t, 500, res.StatusCode)
 	})
-	t.Run("returns 400 when conditional check fails", func(t *testing.T) {
+	t.Run("returns 400 when unique constraint is found", func(t *testing.T) {
 		mockRepo := mocks.Repo{}
 		testCrud := crud.Crud{
 			Repo:   &mockRepo,
@@ -220,7 +220,7 @@ func TestCreateUser(t *testing.T) {
 		}
 
 		ctx := context.Background()
-		mockRepo.On("CreateUser", mock.Anything, mock.Anything).Return(nil, &dynamodb.ConditionalCheckFailedException{})
+		mockRepo.On("CreateUser", mock.Anything, mock.Anything).Return(nil, &dynamo.UniqueConstraintViolation{})
 
 		userMap := getUserMap()
 
