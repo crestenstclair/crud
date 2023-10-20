@@ -9,7 +9,6 @@ import (
 	"github.com/crestenstclair/crud/internal/user"
 )
 
-
 func (d DynamoRepo) GetUser(ctx context.Context, userID string) (*user.User, error) {
 	response, err := d.client.GetItem(&dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
