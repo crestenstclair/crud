@@ -9,8 +9,8 @@ TODO:
 - [DONE] /users (POST) to add a new user
 - [DONE] /users/ GET to retrieve details of the user
 - [DONE] PUT
-- [TODO] DELETE
-- [TODO] Error handling with descriptive error code and message
+- [DONE] DELETE
+- [DONE] Error handling with descriptive error code and message
 - [TODO] Run all commands in docker container
 - [WONT] Local integration tests
 - [TODO] Add test to ensure client is working
