@@ -59,6 +59,12 @@ functions:
       - httpApi:
           path: /user/{id}
           method: put
+  delete_user:
+    handler: bin/handlers/delete_user
+    events:
+      - httpApi:
+          path: /user/{id}
+          method: delete
   create_user:
     handler: bin/handlers/create_user
     events:
@@ -77,12 +83,12 @@ resources:
           - AttributeName: "Email"
             AttributeType: "S"
         KeySchema:
-          - AttributeName: "Email"
+          - AttributeName: "ID"
             KeyType: "HASH"
         GlobalSecondaryIndexes:
-          - IndexName: "UserID"
+          - IndexName: "email"
             KeySchema:
-              - AttributeName: "ID"
+              - AttributeName: "Email"
                 KeyType: "HASH"
             Projection:
               ProjectionType: "KEYS_ONLY"

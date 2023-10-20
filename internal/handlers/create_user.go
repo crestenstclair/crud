@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/crestenstclair/crud/internal/crud"
+	"github.com/crestenstclair/crud/internal/repo/dynamo"
 	"github.com/crestenstclair/crud/internal/user"
 	"go.uber.org/zap"
 )
@@ -45,7 +45,7 @@ func CreateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 	switch err.(type) {
 	case nil:
 		return makeResponse(usr, 200), nil
-	case *dynamodb.ConditionalCheckFailedException:
+	case *dynamo.UniqueConstraintViolation:
 		crud.Logger.Error("Failed to create user, email already in use", zap.Error(err))
 		return makeResponse(map[string]string{
 			"error": "Email already in use",

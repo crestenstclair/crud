@@ -16,7 +16,6 @@ func UpdateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(crud.Config.RequestTimeoutMS)*time.Millisecond)
 
 	defer cancel()
-	crud.Logger.Info(request.Body)
 
 	usr, err := user.Parse(request.Body)
 	if err != nil {
