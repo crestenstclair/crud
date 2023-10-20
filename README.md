@@ -140,14 +140,14 @@ This command runs the golang test suite.
 make testv
 ```
 
-This command runs the golang test suite in verboase mode
+This command runs the golang test suite in verbose mode
 
 #### gen
 ```
 make gen
 ```
 
-This command runs automated code generation for our golang repositoires.
+This command runs automated code generation for our golang repositories.
 
 In the future we may wish to add a JSONSchema or documentation generation command.
 
