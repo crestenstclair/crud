@@ -26,7 +26,7 @@ func DeleteUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 		crud.Logger.Error("Failed to delete user, ID not found", zap.Error(err))
 		return makeResponse(map[string]string{
 			"error": "Failed to delete user, ID not found",
-			id:      id,
+			"id":    id,
 		}, 404), nil
 	default:
 		crud.Logger.Error("Failed to delete user", zap.Error(err))

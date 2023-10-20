@@ -45,6 +45,23 @@ func (m *DynamodbMockClient) GetItem(input *dynamodb.GetItemInput) (*dynamodb.Ge
 	return resultOne, args.Error(1)
 }
 
+func (m *DynamodbMockClient) UpdateItem(input *dynamodb.UpdateItemInput) (*dynamodb.UpdateItemOutput, error) {
+	// Ferry arguments into mock call
+	args := m.Called(input)
+
+	arg0 := args.Get(0)
+	var resultOne *dynamodb.UpdateItemOutput
+	if arg0 != nil {
+		resultOne = arg0.(*dynamodb.UpdateItemOutput)
+	} else {
+		resultOne = &dynamodb.UpdateItemOutput{
+			Attributes: nil,
+		}
+	}
+
+	return resultOne, args.Error(1)
+}
+
 func (m *DynamodbMockClient) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
 	args := m.Called(input)
 
@@ -278,7 +295,7 @@ func TestUpdateUser(t *testing.T) {
 					}},
 			},
 		}, nil)
-		client.On("PutItem", mock.Anything).Return(user.User{}, errors.New("test error"))
+		client.On("UpdateItem", mock.Anything).Return(nil, errors.New("test error"))
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{})
 
@@ -305,7 +322,7 @@ func TestUpdateUser(t *testing.T) {
 				},
 			}},
 		}, nil)
-		putMock := client.On("PutItem", mock.Anything).Return(nil, nil)
+		putMock := client.On("UpdateItem", mock.Anything).Return(nil, nil)
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{
 			ID:           userID,
@@ -319,14 +336,12 @@ func TestUpdateUser(t *testing.T) {
 
 		assert.NoError(t, err)
 		call := putMock.Parent.Calls[1]
-		arg := call.Arguments[0].(*dynamodb.PutItemInput)
+		arg := call.Arguments[0].(*dynamodb.UpdateItemInput)
 
-		assert.Equal(t, userID, *arg.Item["ID"].S)
-		assert.Equal(t, DOB, *arg.Item["CreatedAt"].S)
-		assert.Equal(t, firstName, *arg.Item["FirstName"].S)
-		assert.Equal(t, lastName, *arg.Item["LastName"].S)
-		assert.Equal(t, email, *arg.Item["Email"].S)
-		assert.Equal(t, DOB, *arg.Item["DOB"].S)
+		assert.Equal(t, firstName, *arg.ExpressionAttributeValues[":FirstName"].S)
+		assert.Equal(t, lastName, *arg.ExpressionAttributeValues[":LastName"].S)
+		assert.Equal(t, email, *arg.ExpressionAttributeValues[":Email"].S)
+		assert.Equal(t, DOB, *arg.ExpressionAttributeValues[":DOB"].S)
 	})
 
 	t.Run("Properly detects when a user's email is taken", func(t *testing.T) {
@@ -377,7 +392,7 @@ func TestUpdateUser(t *testing.T) {
 					}},
 			},
 		}, nil)
-		client.On("PutItem", mock.Anything).Return(nil, nil)
+		client.On("UpdateItem", mock.Anything).Return(nil, nil)
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{
 			ID:           userID,
