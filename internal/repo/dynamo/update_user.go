@@ -36,7 +36,7 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	delete(av, "CreatedAt")
 	delete(av, "ID")
 
-	// Initialize update expression in order to ensure CreatedAt is not nulled out
+	// Initialize update expression in order to ensure CreatedAt is preserved between updates
 	updateExpression := "set CreatedAt = CreatedAt"
 	expressionValues := map[string]*dynamodb.AttributeValue{}
 
