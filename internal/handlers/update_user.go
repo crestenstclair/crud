@@ -17,7 +17,8 @@ func UpdateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 
 	defer cancel()
 
-	usr, err := user.Parse(request.Body)
+	id := request.PathParameters["id"]
+	usr, err := user.Parse(request.Body, id)
 	if err != nil {
 		crud.Logger.Error("Invalid user provided", zap.Error(err))
 

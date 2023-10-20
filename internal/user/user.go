@@ -19,11 +19,15 @@ type User struct {
 	LastModified string `validate:"RFC3339Date"`
 }
 
-func Parse(jsonString string) (*User, error) {
+func Parse(jsonString string, userID string) (*User, error) {
 	result := &User{}
 	err := json.Unmarshal([]byte(jsonString), &result)
 	if err != nil {
 		return nil, err
+	}
+
+	if userID != "" {
+		result.ID = userID
 	}
 
 	err = validator.GetValidator().Struct(result)
