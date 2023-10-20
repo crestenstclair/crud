@@ -53,6 +53,12 @@ functions:
       - httpApi:
           path: /user/{id}
           method: get
+  update_user:
+    handler: bin/handlers/update_user
+    events:
+      - httpApi:
+          path: /user/{id}
+          method: put
   create_user:
     handler: bin/handlers/create_user
     events:
@@ -74,7 +80,7 @@ resources:
           - AttributeName: "Email"
             KeyType: "HASH"
         GlobalSecondaryIndexes:
-          - IndexName: "ID"
+          - IndexName: "UserID"
             KeySchema:
               - AttributeName: "ID"
                 KeyType: "HASH"

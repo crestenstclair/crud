@@ -17,19 +17,6 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
-func makeTestUser() user.User {
-	testTime := "1979-12-09T00:00:00Z"
-	return user.User{
-		ID:           "id",
-		FirstName:    "firstName",
-		LastName:     "lastName",
-		Email:        "example@example.com",
-		DOB:          testTime,
-		CreatedAt:    testTime,
-		LastModified: testTime,
-	}
-}
-
 func TestGetUser(t *testing.T) {
 	t.Run("Returns 200 and user when fetch successful", func(t *testing.T) {
 		mockRepo := mocks.Repo{}

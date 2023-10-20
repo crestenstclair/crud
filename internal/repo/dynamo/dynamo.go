@@ -15,6 +15,14 @@ type DynamoRepo struct {
 	tableName string
 }
 
+type UniqueConstraintViolation struct {
+	Message string
+}
+
+func (u UniqueConstraintViolation) Error() string {
+	return u.Message
+}
+
 func New(tableName string, db dynamodbiface.DynamoDBAPI) (*DynamoRepo, error) {
 	return &DynamoRepo{
 		client:    db,
@@ -76,6 +84,18 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	if err != nil {
 		return nil, err
 	}
+
+	existingUser, err := d.GetUserByEmail(ctx, u.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingUser != nil && existingUser.ID != u.ID {
+		return nil, &UniqueConstraintViolation{
+			Message: "User email update failed. Attempted to change email to existing users email.",
+		}
+	}
+
 	_, err = d.client.PutItem(&dynamodb.PutItemInput{
 		Item:                av,
 		TableName:           &d.tableName,
@@ -87,6 +107,34 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	}
 
 	return &u, nil
+}
+
+func (d DynamoRepo) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
+	response, err := d.client.GetItem(&dynamodb.GetItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"Email": {
+				S: aws.String(email),
+			},
+		},
+		TableName: &d.tableName,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Item == nil {
+		return nil, nil
+	}
+
+	var result *user.User
+
+	err = dynamodbattribute.UnmarshalMap(response.Item, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (d DynamoRepo) DeleteUser(ctx context.Context, userID string) error {
