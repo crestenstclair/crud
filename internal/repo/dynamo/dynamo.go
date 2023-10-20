@@ -2,7 +2,6 @@ package dynamo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -21,7 +20,7 @@ type UniqueConstraintViolation struct {
 }
 
 func (u UniqueConstraintViolation) Error() string {
-	return fmt.Sprintf("%s", u.Message)
+	return u.Message
 }
 
 func New(tableName string, db dynamodbiface.DynamoDBAPI) (*DynamoRepo, error) {
