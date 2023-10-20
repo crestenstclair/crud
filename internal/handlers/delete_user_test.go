@@ -32,8 +32,7 @@ func TestDeleteUser(t *testing.T) {
 		res, err := handlers.DeleteUser(ctx, events.APIGatewayProxyRequest{}, &testCrud)
 		assert.NoError(t, err)
 
-    assert.Equal(t, 200, res.StatusCode)
-
+		assert.Equal(t, 200, res.StatusCode)
 	})
 	t.Run("Returns 500 when an internal server error occurs", func(t *testing.T) {
 		mockRepo := mocks.Repo{}
