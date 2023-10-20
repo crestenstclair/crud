@@ -8,16 +8,16 @@ TODO:
 - [DONE] Remove a user record based on UserID
 - [DONE] /users (POST) to add a new user
 - [DONE] /users/ GET to retrieve details of the user
-- [TODO] PUT
+- [DONE] PUT
 - [TODO] DELETE
 - [TODO] Error handling with descriptive error code and message
 - [TODO] Run all commands in docker container
 - [WONT] Local integration tests
 - [TODO] Add test to ensure client is working
 - [TODO] Interesting decisions section for readme
-- [TODO] Update "LastModified" and "CreatedAt" to actually work ( or drop them )
 - [DONE] Update date fields to strings instead of time objects
-- [TODO] move repo functions into own files
+- [DONE] move repo functions into own files
 - [DONE] add proper check for existing user with email
+- [TODO] Update "LastModified" and "CreatedAt" to actually work ( or drop them )
 
 using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html
