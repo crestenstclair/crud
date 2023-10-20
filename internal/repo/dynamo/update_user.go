@@ -2,7 +2,6 @@ package dynamo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -16,12 +15,10 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 		return nil, err
 	}
 
-  fmt.Println(u.Email)
 	existingUser, err := d.GetUserByEmail(ctx, u.Email)
 	if err != nil {
 		return nil, err
 	}
-
 
 	if existingUser != nil && existingUser.ID != u.ID {
 		return nil, &UniqueConstraintViolation{

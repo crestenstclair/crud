@@ -51,8 +51,7 @@ func (d DynamoRepo) GetUserByEmail(ctx context.Context, email string) (*user.Use
 		IndexName:              aws.String("email"),
 		TableName:              &d.tableName,
 	})
-	
-  if err != nil {
+	if err != nil {
 		return nil, err
 	}
 
