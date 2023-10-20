@@ -2,6 +2,7 @@ package dynamo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -22,23 +23,54 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 		}
 	}
 
-	u.CreatedAt = existingUser.CreatedAt
+	// Update last modified to right now
 	u.LastModified = time.Now().Format(time.RFC3339)
 
+	// Marshal into map to avoid a bunch of boilerplate
 	av, err := dynamodbattribute.MarshalMap(u)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = d.client.PutItem(&dynamodb.PutItemInput{
-		Item:                av,
-		TableName:           &d.tableName,
-		ConditionExpression: aws.String("attribute_exists(ID)"),
+	// Remove unwanted fields
+	delete(av, "CreatedAt")
+	delete(av, "ID")
+
+	// Initialize update expression in order to ensure CreatedAt is not nulled out
+	updateExpression := "set CreatedAt = CreatedAt"
+	expressionValues := map[string]*dynamodb.AttributeValue{}
+
+	// Populate expression and value map with escaped "expressionvalue" keys
+	for k, v := range av {
+		key := ":" + k
+		updateExpression += fmt.Sprintf(", %s = :%s", k, k)
+		expressionValues[key] = v
+	}
+
+	response, err := d.client.UpdateItem(&dynamodb.UpdateItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"ID": {
+				S: aws.String(u.ID),
+			},
+		},
+		TableName:                 &d.tableName,
+		ConditionExpression:       aws.String("attribute_exists(ID)"),
+		UpdateExpression:          aws.String(updateExpression),
+		ExpressionAttributeValues: expressionValues,
+		ReturnValues:              aws.String("ALL_NEW"),
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &u, nil
+	var result *user.User
+
+	err = dynamodbattribute.UnmarshalMap(response.Attributes, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
