@@ -1,5 +1,6 @@
 # Crud
 - [Crud](#crud)
+    - [Notes from the author](#notes-from-the-author)
     - [Getting Started](#getting-started)
     - [Commands](#commands)
       - [build](#build)
@@ -18,7 +19,50 @@
       - [DELETE /user/{id}](#delete-userid)
     - [Deploying](#deploying)
     - [Testing](#testing)
-    - [Notes from the author](#notes-from-the-author)
+
+### Notes from the author
+
+This project represents a reasonable approximation of what I consider to be a toy-level production-ready golang microservice.
+
+Since this project is time-boxed to one week, I was forced to make a few trade-offs in quality for time sake.
+
+To call out a few things I would change:
+
+- Delegatinvg validation to the `user` package is a bit backwards and creates some awkwardness around handling requests. Specifically, the "UpdateUser" handler and `user.Parse`. What I should be doing is providing a OpenAPI schema, and then validating the request itself against that.
+
+- Speaking of OpenAPI, there are some excellent code generation tools that I would likely involve around request validation. [oapi-codegen](https://github.com/deepmap/oapi-codegen) is widely used and could save writing some boilerplate around requests.
+
+- A lot of the tests should be converted to table-based tests for readability sake, especially the tests having to do with validating lists of missing properties.
+
+- Test code quality could be better in general. There is more copy-paste than I would prefer.
+
+- I would like to have added a docker-compose based local DynamoDB development option, with a local smoke test running against the actual application.
+
+
+
+Below is the TODO list I used while developing the project:
+
+TODO:
+- [WONT] Set up the serverless framework for local testing, etc.
+- [DONE] Should deploy with Serverless deploy
+- [DONE] Spin up DynamoDB
+- [DONE] Enable the addition of a new user with fiels like userid, email. name, DOB, etc.
+- [DONE] Fetch user information based on UserID
+- [DONE] Modify exusting user details using UserID
+- [DONE] Remove a user record based on UserID
+- [DONE] /users (POST) to add a new user
+- [DONE] /users/ GET to retrieve details of the user
+- [DONE] PUT
+- [DONE] DELETE
+- [DONE] Error handling with descriptive error code and message
+- [TODO] Run all commands in docker container
+- [WONT] Local integration tests
+- [WONT] Add test to ensure client is working
+- [WONT] Interesting decisions section for readme
+- [DONE] Update date fields to strings instead of time objects
+- [DONE] move repo functions into own files
+- [DONE] add proper check for existing user with email
+- [DONE] Fix put request to behave a bit better
 
 ### Getting Started
 
@@ -180,51 +224,3 @@ This will build and deploy the application.
 Unit tests can be executed using the `make test` command.
 
 For manual testing, it is recommended you `make deploy` to AWS, and get the API endpoint from the AWS console, and then use the provided postman collection to iterate on your changes.
-
-
-
-### Notes from the author
-
-This project represents a reasonable approximation of what I consider to be a toy-level production-ready golang microservice.
-
-Since this project is time-boxed to one week, I was forced to make a few trade-offs in quality for time sake.
-
-To call out a few things I would change:
-
-- Delegatinvg validation to the `user` package is a bit backwards and creates some awkwardness around handling requests. Specifically, the "UpdateUser" handler and `user.Parse`. What I should be doing is providing a OpenAPI schema, and then validating the request itself against that.
-
-- Speaking of OpenAPI, there are some excellent code generation tools that I would likely involve around request validation. [oapi-codegen](https://github.com/deepmap/oapi-codegen) is widely used and could save writing some boilerplate around requests.
-
-- A lot of the tests should be converted to table-based tests for readability sake, especially the tests having to do with validating lists of missing properties.
-
-- Test code quality could be better in general. There is more copy-paste than I would prefer.
-
-- I would like to have added a docker-compose based local DynamoDB development option, with a local smoke test running against the actual application.
-
-
-
-Below is the TODO list I used while developing the project:
-
-TODO:
-- [WONT] Set up the serverless framework for local testing, etc.
-- [DONE] Should deploy with Serverless deploy
-- [DONE] Spin up DynamoDB
-- [DONE] Enable the addition of a new user with fiels like userid, email. name, DOB, etc.
-- [DONE] Fetch user information based on UserID
-- [DONE] Modify exusting user details using UserID
-- [DONE] Remove a user record based on UserID
-- [DONE] /users (POST) to add a new user
-- [DONE] /users/ GET to retrieve details of the user
-- [DONE] PUT
-- [DONE] DELETE
-- [DONE] Error handling with descriptive error code and message
-- [TODO] Run all commands in docker container
-- [WONT] Local integration tests
-- [WONT] Add test to ensure client is working
-- [WONT] Interesting decisions section for readme
-- [DONE] Update date fields to strings instead of time objects
-- [DONE] move repo functions into own files
-- [DONE] add proper check for existing user with email
-- [DONE] Fix put request to behave a bit better
-
-using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html
