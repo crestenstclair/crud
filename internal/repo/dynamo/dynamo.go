@@ -79,7 +79,7 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	_, err = d.client.PutItem(&dynamodb.PutItemInput{
 		Item:                av,
 		TableName:           &d.tableName,
-		ConditionExpression: aws.String("attribute_exists(ID)"),
+		ConditionExpression: aws.String("attribute_not_exists(Email)"),
 	})
 
 	if err != nil {
