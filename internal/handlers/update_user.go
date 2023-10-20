@@ -43,7 +43,7 @@ func UpdateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 			"error": "Email already in use",
 		}, 400), nil
 	default:
-		crud.Logger.Error("Failed to create user", zap.Error(err))
+		crud.Logger.Error("Failed to update user", zap.Error(err))
 		return makeResponse(map[string]string{
 			"error": "An internal error occured",
 		}, 500), nil
