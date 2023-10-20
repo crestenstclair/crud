@@ -18,6 +18,5 @@ TODO:
 - [DONE] Update date fields to strings instead of time objects
 - [DONE] move repo functions into own files
 - [DONE] add proper check for existing user with email
-- [TODO] Update "LastModified" and "CreatedAt" to actually work ( or drop them )
 
 using global state / init: https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html
