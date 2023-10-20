@@ -2,6 +2,7 @@ package dynamo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -13,6 +14,14 @@ import (
 type DynamoRepo struct {
 	client    dynamodbiface.DynamoDBAPI
 	tableName string
+}
+
+type UniqueConstraintViolation struct {
+  Message string
+}
+
+func (u UniqueConstraintViolation) Error() string {
+   return fmt.Sprintf("%s", u.Message)
 }
 
 func New(tableName string, db dynamodbiface.DynamoDBAPI) (*DynamoRepo, error) {
@@ -76,10 +85,23 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	if err != nil {
 		return nil, err
 	}
+
+  existingUser, err := d.GetUserByEmail(ctx, u.Email)
+
+  if err != nil {
+		return nil, err
+	}
+
+  if existingUser != nil && existingUser.ID != u.ID {
+    return nil, &UniqueConstraintViolation{
+      Message: "User email update failed. Attempted to change email to existing users email.",
+    }
+  }
+
 	_, err = d.client.PutItem(&dynamodb.PutItemInput{
 		Item:                av,
 		TableName:           &d.tableName,
-		ConditionExpression: aws.String("attribute_not_exists(Email)"),
+		ConditionExpression: aws.String("attribute_exists(ID)"),
 	})
 
 	if err != nil {
@@ -87,6 +109,38 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	}
 
 	return &u, nil
+}
+
+
+func (d DynamoRepo) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
+  response, err := d.client.GetItem(&dynamodb.GetItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"Email": {
+				S: aws.String(email),
+			},
+		},
+		TableName: &d.tableName,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Item == nil {
+		// We don't return an error in this case b/c it is not
+		// an error specific to querying DynamoDB.
+		// That will be handled at a higher level.
+		return nil, nil
+	}
+
+	var result *user.User
+
+	err = dynamodbattribute.UnmarshalMap(response.Item, &result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (d DynamoRepo) DeleteUser(ctx context.Context, userID string) error {
