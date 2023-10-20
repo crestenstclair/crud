@@ -41,7 +41,7 @@ provider:
             - dynamodb:Delete*
             - dynamodb:Update*
             - dynamodb:PutItem
-          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}*"
 package:
   patterns:
     - '!./**'

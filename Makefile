@@ -1,4 +1,4 @@
-.PHONY: build clean deploy
+.PHONY: build clean deploy down fmt test tstv gen lint
 SHELL:=/bin/bash
 
 .ONESHELL:
@@ -18,7 +18,7 @@ down:
 	sls remove --verbose --region us-west-2
 
 fmt:
-	gofumpt -l -w .
+	go fmt ./...
 
 test:
 	go test ./...
