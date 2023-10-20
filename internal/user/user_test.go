@@ -148,7 +148,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		_, err = user.Parse(string(str))
+		_, err = user.Parse(string(str), "")
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
@@ -159,7 +159,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		_, err = user.Parse(string(str))
+		_, err = user.Parse(string(str), "")
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.DOB'")
 	})
 	t.Run("Errors when not provided required FirstName", func(t *testing.T) {
@@ -169,7 +169,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		_, err = user.Parse(string(str))
+		_, err = user.Parse(string(str), "")
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.FirstName'")
 	})
@@ -180,7 +180,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		_, err = user.Parse(string(str))
+		_, err = user.Parse(string(str), "")
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.LastName'")
 	})
@@ -191,7 +191,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		_, err = user.Parse(string(str))
+		_, err = user.Parse(string(str), "")
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.Email'")
 	})
@@ -202,7 +202,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		_, err = user.Parse(string(str))
+		_, err = user.Parse(string(str), "")
 
 		assert.ErrorContains(t, err, "User validation failed. Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag")
 	})
@@ -212,7 +212,7 @@ func TestParse(t *testing.T) {
 		str, err := json.Marshal(testUser)
 		assert.NoError(t, err)
 
-		result, err := user.Parse(string(str))
+		result, err := user.Parse(string(str), "")
 		assert.NoError(t, err)
 
 		assert.Equal(t, testUser.FirstName, result.FirstName)
