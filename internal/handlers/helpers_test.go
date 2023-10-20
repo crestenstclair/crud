@@ -23,7 +23,7 @@ func toUserMap(u *user.User) map[string]string {
 		"lastName":  u.LastName,
 		"email":     u.Email,
 		"DOB":       u.DOB,
-    "ID": u.ID,
+		"ID":        u.ID,
 	}
 }
 

@@ -204,7 +204,7 @@ func TestUpdateUser(t *testing.T) {
 
 		mockRepo.On("UpdateUser", mock.Anything, mock.Anything).Return(nil, errors.New("something went wrong"))
 
-    testUser := makeTestUser()
+		testUser := makeTestUser()
 		userMap := toUserMap(&testUser)
 
 		res, err := handlers.UpdateUser(ctx, events.APIGatewayProxyRequest{
@@ -234,7 +234,7 @@ func TestUpdateUser(t *testing.T) {
 
 		assert.Equal(t, 400, res.StatusCode)
 	})
-  t.Run("returns 400 when uniqueness violation occurs", func(t *testing.T) {
+	t.Run("returns 400 when uniqueness violation occurs", func(t *testing.T) {
 		mockRepo := mocks.Repo{}
 		testCrud := crud.Crud{
 			Repo:   &mockRepo,
