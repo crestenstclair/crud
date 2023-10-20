@@ -38,6 +38,7 @@ To call out a few things I would change:
 
 - I would like to have added a docker-compose based local DynamoDB development option, with a local smoke test running against the actual application.
 
+- I would like to run all commands in the `Makefile` with a docker container for portability.
 
 
 Below is the TODO list I used while developing the project:
@@ -55,7 +56,7 @@ TODO:
 - [DONE] PUT
 - [DONE] DELETE
 - [DONE] Error handling with descriptive error code and message
-- [TODO] Run all commands in docker container
+- [WONT] Run all commands in docker container
 - [WONT] Local integration tests
 - [WONT] Add test to ensure client is working
 - [WONT] Interesting decisions section for readme
