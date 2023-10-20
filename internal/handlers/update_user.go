@@ -32,7 +32,7 @@ func UpdateUser(ctx context.Context, request events.APIGatewayProxyRequest, crud
 	switch err.(type) {
 	case nil:
 		return makeResponse(usr, 200), nil
-  case *dynamo.UniqueConstraintViolation:
+	case *dynamo.UniqueConstraintViolation:
 		crud.Logger.Error("Failed to update user, email already in use", zap.Error(err))
 		return makeResponse(map[string]string{
 			"error": "Email already in use",

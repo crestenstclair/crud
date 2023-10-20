@@ -17,11 +17,11 @@ type DynamoRepo struct {
 }
 
 type UniqueConstraintViolation struct {
-  Message string
+	Message string
 }
 
 func (u UniqueConstraintViolation) Error() string {
-   return fmt.Sprintf("%s", u.Message)
+	return fmt.Sprintf("%s", u.Message)
 }
 
 func New(tableName string, db dynamodbiface.DynamoDBAPI) (*DynamoRepo, error) {
@@ -86,17 +86,16 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 		return nil, err
 	}
 
-  existingUser, err := d.GetUserByEmail(ctx, u.Email)
-
-  if err != nil {
+	existingUser, err := d.GetUserByEmail(ctx, u.Email)
+	if err != nil {
 		return nil, err
 	}
 
-  if existingUser != nil && existingUser.ID != u.ID {
-    return nil, &UniqueConstraintViolation{
-      Message: "User email update failed. Attempted to change email to existing users email.",
-    }
-  }
+	if existingUser != nil && existingUser.ID != u.ID {
+		return nil, &UniqueConstraintViolation{
+			Message: "User email update failed. Attempted to change email to existing users email.",
+		}
+	}
 
 	_, err = d.client.PutItem(&dynamodb.PutItemInput{
 		Item:                av,
@@ -111,9 +110,8 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 	return &u, nil
 }
 
-
 func (d DynamoRepo) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
-  response, err := d.client.GetItem(&dynamodb.GetItemInput{
+	response, err := d.client.GetItem(&dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"Email": {
 				S: aws.String(email),
@@ -126,9 +124,6 @@ func (d DynamoRepo) GetUserByEmail(ctx context.Context, email string) (*user.Use
 	}
 
 	if response.Item == nil {
-		// We don't return an error in this case b/c it is not
-		// an error specific to querying DynamoDB.
-		// That will be handled at a higher level.
 		return nil, nil
 	}
 
