@@ -2,6 +2,7 @@ package dynamo
 
 import (
 	"context"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -10,11 +11,6 @@ import (
 )
 
 func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, error) {
-	av, err := dynamodbattribute.MarshalMap(u)
-	if err != nil {
-		return nil, err
-	}
-
 	existingUser, err := d.GetUserByEmail(ctx, u.Email)
 	if err != nil {
 		return nil, err
@@ -24,6 +20,14 @@ func (d DynamoRepo) UpdateUser(ctx context.Context, u user.User) (*user.User, er
 		return nil, &UniqueConstraintViolation{
 			Message: "User email update failed. Attempted to change email to existing users email.",
 		}
+	}
+
+	u.CreatedAt = existingUser.CreatedAt
+	u.LastModified = time.Now().Format(time.RFC3339)
+
+	av, err := dynamodbattribute.MarshalMap(u)
+	if err != nil {
+		return nil, err
 	}
 
 	_, err = d.client.PutItem(&dynamodb.PutItemInput{

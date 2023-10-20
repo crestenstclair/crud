@@ -266,8 +266,19 @@ func TestUpdateUser(t *testing.T) {
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
-		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{}, nil)
-		client.On("PutItem", mock.Anything).Return(nil, errors.New("test error"))
+		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{
+			Items: []map[string]*dynamodb.AttributeValue{
+				{
+					"LastModified": {
+						S: aws.String("1234"),
+					}},
+				{
+					"CreatedAt": {
+						S: aws.String("1234"),
+					}},
+			},
+		}, nil)
+		client.On("PutItem", mock.Anything).Return(user.User{}, errors.New("test error"))
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{})
 
@@ -278,24 +289,13 @@ func TestUpdateUser(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 
-		client.On("Query", mock.Anything, mock.Anything).Return(nil, nil)
-		client.On("PutItem", &dynamodb.PutItemInput{
-			ConditionExpression: aws.String("attribute_exists(ID)"),
-			Item: map[string]*dynamodb.AttributeValue{
+		client.On("Query", mock.Anything, mock.Anything).Return(&dynamodb.QueryOutput{
+			Items: []map[string]*dynamodb.AttributeValue{{
 				"ID": {
 					S: aws.String(userID),
 				},
-				"FirstName": {
-					S: aws.String(firstName),
-				},
-				"LastName": {
-					S: aws.String(lastName),
-				},
 				"Email": {
 					S: aws.String(email),
-				},
-				"DOB": {
-					S: aws.String(DOB),
 				},
 				"CreatedAt": {
 					S: aws.String(DOB),
@@ -303,9 +303,9 @@ func TestUpdateUser(t *testing.T) {
 				"LastModified": {
 					S: aws.String(DOB),
 				},
-			},
-			TableName: aws.String("tableName"),
-		}).Return(nil, nil)
+			}},
+		}, nil)
+		putMock := client.On("PutItem", mock.Anything).Return(nil, nil)
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{
 			ID:           userID,
@@ -318,6 +318,15 @@ func TestUpdateUser(t *testing.T) {
 		})
 
 		assert.NoError(t, err)
+		call := putMock.Parent.Calls[1]
+		arg := call.Arguments[0].(*dynamodb.PutItemInput)
+
+		assert.Equal(t, userID, *arg.Item["ID"].S)
+		assert.Equal(t, DOB, *arg.Item["CreatedAt"].S)
+		assert.Equal(t, firstName, *arg.Item["FirstName"].S)
+		assert.Equal(t, lastName, *arg.Item["LastName"].S)
+		assert.Equal(t, email, *arg.Item["Email"].S)
+		assert.Equal(t, DOB, *arg.Item["DOB"].S)
 	})
 
 	t.Run("Properly detects when a user's email is taken", func(t *testing.T) {
@@ -352,42 +361,23 @@ func TestUpdateUser(t *testing.T) {
 		repo, _ := dynamo.New("tableName", client)
 
 		client.On("Query", mock.Anything, mock.Anything).Return(&dynamodb.QueryOutput{
-			Items: []map[string]*dynamodb.AttributeValue{{
-				"ID": {
-					S: aws.String(userID),
-				},
-				"Email": {
-					S: aws.String(email),
-				},
-			}},
-		}, nil)
-		client.On("PutItem", &dynamodb.PutItemInput{
-			ConditionExpression: aws.String("attribute_exists(ID)"),
-			Item: map[string]*dynamodb.AttributeValue{
-				"ID": {
-					S: aws.String(userID),
-				},
-				"FirstName": {
-					S: aws.String(firstName),
-				},
-				"LastName": {
-					S: aws.String(lastName),
-				},
-				"Email": {
-					S: aws.String(email),
-				},
-				"DOB": {
-					S: aws.String(DOB),
-				},
-				"CreatedAt": {
-					S: aws.String(DOB),
-				},
-				"LastModified": {
-					S: aws.String(DOB),
-				},
+			Items: []map[string]*dynamodb.AttributeValue{
+				{
+					"ID": {
+						S: aws.String(userID),
+					}},
+
+				{
+					"LastModified": {
+						S: aws.String("1234"),
+					}},
+				{
+					"CreatedAt": {
+						S: aws.String("1234"),
+					}},
 			},
-			TableName: aws.String("tableName"),
-		}).Return(nil, nil)
+		}, nil)
+		client.On("PutItem", mock.Anything).Return(nil, nil)
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{
 			ID:           userID,
