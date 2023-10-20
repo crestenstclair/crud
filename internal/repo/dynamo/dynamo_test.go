@@ -57,6 +57,20 @@ func (m *DynamodbMockClient) DeleteItem(input *dynamodb.DeleteItemInput) (*dynam
 	return nil, args.Error(1)
 }
 
+func (m *DynamodbMockClient) Query(input *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
+	args := m.Called(input)
+
+	arg0 := args.Get(0)
+	var resultOne *dynamodb.QueryOutput
+	if arg0 != nil {
+		resultOne = arg0.(*dynamodb.QueryOutput)
+	} else {
+		resultOne = &dynamodb.QueryOutput{}
+	}
+
+	return resultOne, args.Error(1)
+}
+
 func TestGetUser(t *testing.T) {
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
@@ -125,7 +139,9 @@ func TestGetUserByEmail(t *testing.T) {
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
-		client.On("GetItem", mock.Anything).Return(nil, errors.New("test error"))
+
+		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{}, errors.New("test error"))
+
 		ctx := context.Background()
 		_, err := repo.GetUserByEmail(ctx, userID)
 
@@ -135,7 +151,9 @@ func TestGetUserByEmail(t *testing.T) {
 	t.Run("Returns nil, no error when user is not found", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
-		client.On("GetItem", mock.Anything).Return(nil, nil)
+		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{
+			Items: []map[string]*dynamodb.AttributeValue{},
+		}, nil)
 		ctx := context.Background()
 		res, err := repo.GetUserByEmail(ctx, userID)
 
@@ -146,15 +164,17 @@ func TestGetUserByEmail(t *testing.T) {
 	t.Run("Mashalls properties as expected when User is found", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
-		client.On("GetItem", &dynamodb.GetItemInput{
-			Key: map[string]*dynamodb.AttributeValue{
-				"Email": {
+		client.On("Query", &dynamodb.QueryInput{
+			ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+				":email": {
 					S: aws.String(email),
 				},
 			},
-			TableName: aws.String("tableName"),
-		}).Return(&dynamodb.GetItemOutput{
-			Item: map[string]*dynamodb.AttributeValue{
+			KeyConditionExpression: aws.String("Email = :email"),
+			IndexName:              aws.String("email"),
+			TableName:              aws.String("tableName"),
+		}).Return(&dynamodb.QueryOutput{
+			Items: []map[string]*dynamodb.AttributeValue{{
 				"ID": {
 					S: aws.String(userID),
 				},
@@ -170,7 +190,7 @@ func TestGetUserByEmail(t *testing.T) {
 				"DOB": {
 					S: aws.String(DOB),
 				},
-			},
+			}},
 		}, nil)
 		ctx := context.Background()
 		result, err := repo.GetUserByEmail(ctx, email)
@@ -189,6 +209,7 @@ func TestCreateUser(t *testing.T) {
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
+		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{}, nil)
 		client.On("PutItem", mock.Anything).Return(nil, errors.New("test error"))
 		ctx := context.Background()
 		_, err := repo.CreateUser(ctx, user.User{})
@@ -199,6 +220,7 @@ func TestCreateUser(t *testing.T) {
 	t.Run("Properly marshalls passed in user into attribute struct", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
+		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{}, nil)
 		client.On("PutItem", &dynamodb.PutItemInput{
 			Item: map[string]*dynamodb.AttributeValue{
 				"ID": {
@@ -223,8 +245,7 @@ func TestCreateUser(t *testing.T) {
 					S: aws.String(DOB),
 				},
 			},
-			ConditionExpression: aws.String("attribute_not_exists(Email)"),
-			TableName:           aws.String("tableName"),
+			TableName: aws.String("tableName"),
 		}).Return(nil, nil)
 		ctx := context.Background()
 		_, err := repo.CreateUser(ctx, user.User{
@@ -245,7 +266,7 @@ func TestUpdateUser(t *testing.T) {
 	t.Run("Returns error when error occurs", func(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
-		client.On("GetItem", mock.Anything, mock.Anything).Return(nil, nil)
+		client.On("Query", mock.Anything).Return(&dynamodb.QueryOutput{}, nil)
 		client.On("PutItem", mock.Anything).Return(nil, errors.New("test error"))
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{})
@@ -257,7 +278,7 @@ func TestUpdateUser(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 
-		client.On("GetItem", mock.Anything, mock.Anything).Return(nil, nil)
+		client.On("Query", mock.Anything, mock.Anything).Return(nil, nil)
 		client.On("PutItem", &dynamodb.PutItemInput{
 			ConditionExpression: aws.String("attribute_exists(ID)"),
 			Item: map[string]*dynamodb.AttributeValue{
@@ -303,15 +324,15 @@ func TestUpdateUser(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 
-		client.On("GetItem", mock.Anything, mock.Anything).Return(&dynamodb.GetItemOutput{
-			Item: map[string]*dynamodb.AttributeValue{
+		client.On("Query", mock.Anything, mock.Anything).Return(&dynamodb.QueryOutput{
+			Items: []map[string]*dynamodb.AttributeValue{{
 				"ID": {
 					S: aws.String("DifferentID"),
 				},
 				"Email": {
 					S: aws.String(email),
 				},
-			},
+			}},
 		}, nil)
 		ctx := context.Background()
 		_, err := repo.UpdateUser(ctx, user.User{
@@ -330,15 +351,15 @@ func TestUpdateUser(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 
-		client.On("GetItem", mock.Anything, mock.Anything).Return(&dynamodb.GetItemOutput{
-			Item: map[string]*dynamodb.AttributeValue{
+		client.On("Query", mock.Anything, mock.Anything).Return(&dynamodb.QueryOutput{
+			Items: []map[string]*dynamodb.AttributeValue{{
 				"ID": {
 					S: aws.String(userID),
 				},
 				"Email": {
 					S: aws.String(email),
 				},
-			},
+			}},
 		}, nil)
 		client.On("PutItem", &dynamodb.PutItemInput{
 			ConditionExpression: aws.String("attribute_exists(ID)"),
@@ -397,8 +418,8 @@ func TestDeleteUser(t *testing.T) {
 		client := &DynamodbMockClient{}
 		repo, _ := dynamo.New("tableName", client)
 		client.On("DeleteItem", &dynamodb.DeleteItemInput{
-			TableName:           aws.String("tableName"),
 			ConditionExpression: aws.String("attribute_exists(ID)"),
+			TableName:           aws.String("tableName"),
 			Key: map[string]*dynamodb.AttributeValue{
 				"ID": {
 					S: aws.String(userID),
