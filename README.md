@@ -28,7 +28,7 @@ Since this project is time-boxed to one week, I was forced to make a few trade-o
 
 To call out a few things I would change:
 
-- Delegatinvg validation to the `user` package is a bit backwards and creates some awkwardness around handling requests. Specifically, the "UpdateUser" handler and `user.Parse`. What I should be doing is providing a OpenAPI schema, and then validating the request itself against that.
+- Delegating validation to the `user` package is a bit backwards and creates some awkwardness around handling requests. Specifically, the "UpdateUser" handler and `user.Parse`. What I should be doing is providing a OpenAPI schema, and then validating the request itself against that.
 
 - Speaking of OpenAPI, there are some excellent code generation tools that I would likely involve around request validation. [oapi-codegen](https://github.com/deepmap/oapi-codegen) is widely used and could save writing some boilerplate around requests.
 
@@ -47,9 +47,9 @@ TODO:
 - [WONT] Set up the serverless framework for local testing, etc.
 - [DONE] Should deploy with Serverless deploy
 - [DONE] Spin up DynamoDB
-- [DONE] Enable the addition of a new user with fiels like userid, email. name, DOB, etc.
+- [DONE] Enable the addition of a new user with fields like userid, email. name, DOB, etc.
 - [DONE] Fetch user information based on UserID
-- [DONE] Modify exusting user details using UserID
+- [DONE] Modify existing user details using UserID
 - [DONE] Remove a user record based on UserID
 - [DONE] /users (POST) to add a new user
 - [DONE] /users/ GET to retrieve details of the user
@@ -67,9 +67,9 @@ TODO:
 
 ### Getting Started
 
-This application requies a linux or Unix system to function.
+This application requires a linux or Unix system to function.
 
-On windows I hightly recommend the WSL2 linux emulation functionality.
+On windows I highly recommend the WSL2 linux emulation functionality.
 
 To get started, you will need the following applications installed:
 
