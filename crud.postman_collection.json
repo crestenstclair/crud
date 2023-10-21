@@ -10,12 +10,35 @@
 			"name": "get",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "{{apiUrl}}/user/{{id}}",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"user",
+						"{{id}}"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(pm.response.json())\r",
+							"\r",
+							"pm.collectionVariables.set(\"id\", pm.response.json().ID);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -86,6 +109,26 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "apiUrl",
@@ -93,7 +136,7 @@
 		},
 		{
 			"key": "id",
-			"value": "e59522ed-8047-4d3f-8a77-0d562598cb3b"
+			"value": ""
 		}
 	]
 }
